@@ -32,8 +32,8 @@ set -x MANPAGER '/bin/bash -c "vim -MRn -c \"set buftype=nofile showtabline=0 ft
 
 ### SET EITHER DEFAULT EMACS MODE OR VI MODE ###
 function fish_user_key_bindings
-  # fish_default_key_bindings
-  fish_vi_key_bindings
+   fish_default_key_bindings
+  # fish_vi_key_bindings
 end
 ### END OF VI MODE ###
 
