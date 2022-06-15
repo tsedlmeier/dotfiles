@@ -18,9 +18,16 @@ local dpi   = require("beautiful.xresources").apply_dpi
 local math, string, os = math, string, os
 local my_table = awful.util.table or gears.table -- 4.{0,1} compatibility
 
+
+-- Choose random wallpaper
+-- local jpgFile = os.execute("find /wallpapers/wallpapers/. -type f | shuf -n 1")
+
+
+
 local theme                                     = {}
 theme.dir                                       = os.getenv("HOME") .. "/.config/awesome/themes/powerarrow"
 theme.wallpaper                                 = theme.dir .. "/wallpapers/wallpapers/0005.jpg"
+--theme.wallpaper                                 = theme.dir .. jpgFile
 theme.font                                      = "Terminus 9"
 theme.fg_normal                                 = "#FEFEFE"
 theme.fg_focus                                  = "#32D6FF"
