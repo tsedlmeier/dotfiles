@@ -1,0 +1,36 @@
+# MUTTRC for TH-Nuernberg
+
+set editor = nvim
+set my_name = "Toni Sedlmeier"
+set my_user = sedlmeierto75189
+
+set imap_user = "sedlmeierto75189@th-nuernberg.de"
+set imap_pass = "mypass" 
+
+### IMAP ###
+# Instead of a local dir, use your server
+set folder = "imaps://$my_user@my.ohmportal.de/"
+# The spoolfile is the folder where your (unfiltered) e-mail arrive
+set spoolfile=+INBOX
+# How often to check for new mail (time in seconds).
+set mail_check = 120
+# Keep the IMAP connection alive by polling intermittently (time in seconds).
+set imap_keepalive = 300
+
+### SMTP ###
+set smtp_url = "smtps://$my_user@my.ohmportal.de:465/"
+set smtp_pass = "mypass" 
+
+
+#LOGIN authentication method specify explicitly
+set smtp_authenticators = "login"
+set record = "+Send Items"
+#
+# activate TLS if available on the server
+set ssl_starttls=yes
+# always use SSL when connecting to a server
+set ssl_force_tls=yes
+
+### COLORS ###
+#       Object      Foreground      Background
+color   error        brightred         black
