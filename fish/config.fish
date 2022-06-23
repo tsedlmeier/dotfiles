@@ -1,11 +1,3 @@
-#  ____ _____
-# |  _ \_   _|  Derek Taylor (DistroTube)
-# | | | || |    http://www.youtube.com/c/DistroTube
-# | |_| || |    http://www.gitlab.com/dwt1/
-# |____/ |_|
-#
-# My fish config. Not much to see here; just some pretty standard stuff.
-
 ### ADDING TO THE PATH
 # First line removes the path; second line sets it.  Without the first line,
 # your path gets massive and fish becomes very slow.
@@ -15,14 +7,8 @@ set -U fish_user_paths $HOME/.local/bin $HOME/Applications $fish_user_paths
 ### EXPORT ###
 set fish_greeting                                 # Supresses fish's intro message
 set TERM "xterm-256color"                         # Sets the terminal type
-set EDITOR "emacsclient -t -a ''"                 # $EDITOR use Emacs in terminal
-set VISUAL "emacsclient -c -a emacs"              # $VISUAL use Emacs in GUI mode
-
-### SET MANPAGER
-### Uncomment only one of these!
-
-### "bat" as manpager
-#set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
+set EDITOR "nvim"                                 # $EDITOR use nvim in terminal
+set VISUAL  "nvim"                                # $VISUAL use nvim in GUI modeset VISUAL "emacsclient -c -a emacs"              # $VISUAL use Emacs in GUI mode
 
 ### "vim" as manpager
 set -x MANPAGER '/bin/bash -c "vim -MRn -c \"set buftype=nofile showtabline=0 ft=man ts=8 nomod nolist norelativenumber nonu noma\" -c \"normal L\" -c \"nmap q :qa<CR>\"</dev/tty <(col -b)"'
@@ -30,12 +16,11 @@ set -x MANPAGER '/bin/bash -c "vim -MRn -c \"set buftype=nofile showtabline=0 ft
 ### "nvim" as manpager
 #set -x MANPAGER "nvim -c 'set ft=man' -"
 
-### SET EITHER DEFAULT EMACS MODE OR VI MODE ###
+### VI MODE OR NOT ###
 function fish_user_key_bindings
    fish_default_key_bindings
   # fish_vi_key_bindings
 end
-### END OF VI MODE ###
 
 ### AUTOCOMPLETE AND HIGHLIGHT COLORS ###
 set fish_color_normal brcyan
@@ -43,61 +28,6 @@ set fish_color_autosuggestion '#7d7d7d'
 set fish_color_command brcyan
 set fish_color_error '#ff6c6b'
 set fish_color_param brcyan
-
-### SPARK ###
-set -g spark_version 1.0.0
-
-complete -xc spark -n __fish_use_subcommand -a --help -d "Show usage help"
-complete -xc spark -n __fish_use_subcommand -a --version -d "$spark_version"
-complete -xc spark -n __fish_use_subcommand -a --min -d "Minimum range value"
-complete -xc spark -n __fish_use_subcommand -a --max -d "Maximum range value"
-
-function spark -d "sparkline generator"
-    if isatty
-        switch "$argv"
-            case {,-}-v{ersion,}
-                echo "spark version $spark_version"
-            case {,-}-h{elp,}
-                echo "usage: spark [--min=<n> --max=<n>] <numbers...>  Draw sparklines"
-                echo "examples:"
-                echo "       spark 1 2 3 4"
-                echo "       seq 100 | sort -R | spark"
-                echo "       awk \\\$0=length spark.fish | spark"
-            case \*
-                echo $argv | spark $argv
-        end
-        return
-    end
-
-    command awk -v FS="[[:space:],]*" -v argv="$argv" '
-        BEGIN {
-            min = match(argv, /--min=[0-9]+/) ? substr(argv, RSTART + 6, RLENGTH - 6) + 0 : ""
-            max = match(argv, /--max=[0-9]+/) ? substr(argv, RSTART + 6, RLENGTH - 6) + 0 : ""
-        }
-        {
-            for (i = j = 1; i <= NF; i++) {
-                if ($i ~ /^--/) continue
-                if ($i !~ /^-?[0-9]/) data[count + j++] = ""
-                else {
-                    v = data[count + j++] = int($i)
-                    if (max == "" && min == "") max = min = v
-                    if (max < v) max = v
-                    if (min > v ) min = v
-                }
-            }
-            count += j - 1
-        }
-        END {
-            n = split(min == max && max ? "▅ ▅" : "▁ ▂ ▃ ▄ ▅ ▆ ▇ █", blocks, " ")
-            scale = (scale = int(256 * (max - min) / (n - 1))) ? scale : 1
-            for (i = 1; i <= count; i++)
-                out = out (data[i] == "" ? " " : blocks[idx = int(256 * (data[i] - min) / scale) + 1])
-            print out
-        }
-    '
-end
-### END OF SPARK ###
-
 
 ### FUNCTIONS ###
 # Spark functions
@@ -189,30 +119,14 @@ function take --argument number
     head -$number
 end
 
-# Function for org-agenda
-function org-search -d "send a search string to org-mode"
-    set -l output (/usr/bin/emacsclient -a "" -e "(message \"%s\" (mapconcat #'substring-no-properties \
-        (mapcar #'org-link-display-format \
-        (org-ql-query \
-        :select #'org-get-heading \
-        :from  (org-agenda-files) \
-        :where (org-ql--query-string-to-sexp \"$argv\"))) \
-        \"
-    \"))")
-    printf $output
-end
-
-### END OF FUNCTIONS ###
-
 
 ### ALIASES ###
 # \x1b[2J   <- clears tty
 # \x1b[1;1H <- goes to (1, 1) (start)
 alias cl='echo -en "\x1b[2J\x1b[1;1H" ; echo; echo; seq 1 (tput cols) | sort -R | spark | lolcat; echo; echo'
 
-# root privileges
-alias doas="doas --"
 
+# Random new Wallpaper
 alias new_wallpaper='feh --randomize --bg-fill ~/.config/awesome/themes/powerarrow/wallpapers/wallpapers'
 
 # navigation
@@ -222,23 +136,15 @@ alias .3='cd ../../..'
 alias .4='cd ../../../..'
 alias .5='cd ../../../../..'
 
-# vim and emacs
-alias em='/usr/bin/emacs -nw'
-alias emacs="emacsclient -c -a 'emacs'"
-alias doomsync="~/.emacs.d/bin/doom sync"
-alias doomdoctor="~/.emacs.d/bin/doom doctor"
-alias doomupgrade="~/.emacs.d/bin/doom upgrade"
-alias doompurge="~/.emacs.d/bin/doom purge"
 
 # Changing "ls" to "exa"
-alias ll='exa -al --color=always --group-directories-first' # my preferred listing
-alias ls='exa  --color=always --group-directories-first'  # all files and dirs
-alias l='exa -l --color=always --group-directories-first'  # long format
-alias lt='exa -aT --color=always --group-directories-first' # tree listing
+alias ll='exa -al --color=always --group-directories-first' 
+alias ls='exa  --color=always --group-directories-first'  
+alias l='exa -l --color=always --group-directories-first'  
+alias lt='exa -aT --color=always --group-directories-first' 
 alias l.='exa -a | egrep "^\."'
 
-
-# Colorize grep output (good for log files)
+# Colorize grep output 
 alias grep='grep --color=auto'
 alias egrep='egrep --color=auto'
 alias fgrep='fgrep --color=auto'
@@ -249,11 +155,9 @@ alias hg='history | grep'
 # adding flags
 alias df='df -h'                          # human-readable sizes
 alias free='free -m'                      # show sizes in MB
-alias lynx='lynx -cfg=~/.lynx/lynx.cfg -lss=~/.lynx/lynx.lss -vikeys'
-alias vifm='./.config/vifm/scripts/vifmrun'
-alias ncmpcpp='ncmpcpp ncmpcpp_directory=$HOME/.config/ncmpcpp/'
-alias mocp='mocp -M "$XDG_CONFIG_HOME"/moc -O MOCDir="$XDG_CONFIG_HOME"/moc'
 
+alias lynx='lynx -cfg=~/.lynx/lynx.cfg -lss=~/.lynx/lynx.lss -vikeys'
+#DuckDuckGo lynx alias for wrapper-script
 alias '\?'=duck
 
 # ps
@@ -280,13 +184,7 @@ alias push='git push origin'
 alias tag='git tag'
 alias newtag='git tag -a'
 
-# get error messages from journalctl
-alias jctl="journalctl -p 3 -xb"
 
-# Play audio files in current dir by type
-alias playwav='deadbeef *.wav'
-alias playogg='deadbeef *.ogg'
-alias playmp3='deadbeef *.mp3'
 alias open='xdg-open'
 
 # Play video files in current dir by type
@@ -295,27 +193,9 @@ alias playmov='vlc *.mov'
 alias playmp4='vlc *.mp4'
 
 # switch between shells
-# I do not recommend switching default SHELL from bash.
 alias tobash="sudo chsh $USER -s /bin/bash && echo 'Now log out.'"
 alias tozsh="sudo chsh $USER -s /bin/zsh && echo 'Now log out.'"
 alias tofish="sudo chsh $USER -s /bin/fish && echo 'Now log out.'"
-
-# bare git repo alias for dotfiles
-alias config="/usr/bin/git --git-dir=$HOME/dotfiles --work-tree=$HOME"
-
-# termbin
-alias tb="nc termbin.com 9999"
-
-
-### DTOS ###
-# Copy/paste all content of /etc/dtos over to home folder. A backup of config is created. (Be careful running this!)
-alias dtoscopy='[ -d ~/.config ] || mkdir ~/.config && cp -Rf ~/.config ~/.config-backup-(date +%Y.%m.%d-%H.%M.%S) && cp -rf /etc/dtos/* ~'
-# Backup contents of /etc/dtos to a backup folder in $HOME.
-alias dtosbackup='cp -Rf /etc/dtos ~/dtos-backup-(date +%Y.%m.%d-%H.%M.%S)'
-
-
-### SETTING THE STARSHIP PROMPT ###
-#starship init fish | source
 
 set PKG_CONFIG_PATH $PKG_CONFIG_PATH:/usr/local/lib/PKG_CONFIG_PATH
 
