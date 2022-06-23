@@ -1,2 +1,2 @@
 # Config Files
-![Screenshot](doc/screenshot.png)
+![Screenshot](./doc/screenshot.png)
