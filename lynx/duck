@@ -1,0 +1,2 @@
+#!/bin/sh
+lynx -accept_all_cookies "duckduckgo.com/lite?q=$*"
