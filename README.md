@@ -1,2 +1,3 @@
 # Config Files
-![Screenshot](doc/screenshot.png)
+Screenshot of current config
+![alt text](https://github.com/tsedlmeier/dotfiles/blob/main/doc/screenshot.PNG)
