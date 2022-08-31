@@ -5,6 +5,7 @@ function run {
         $@&
     fi
 }
-
+feh --randomize --bg-fill ~/.config/awesome/themes/powerarrow/wallpapers/wallpapers
 run numlockx
-run xcompmgr # sudo apt install xcompmgr
+run picom
+#run xcompmgr # sudo apt install xcompmgr
