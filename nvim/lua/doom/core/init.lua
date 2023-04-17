@@ -1,31 +1,61 @@
---- Main Doom configuration file
---- This file loads all doom core components
---- (ui, options, doomrc, etc)
+--[[
+--  doom.core
+--
+--  Entrypoint for the doom-nvim framework.
+--
+--]]
 
-local log = require("doom.extras.logging")
+-- Disable vim builtins for faster startup time
+local g = vim.g
 
-log.debug("Loading Doom core ...")
+g.loaded_gzip = 1
+g.loaded_zip = 1
+g.loaded_zipPlugin = 1
+g.loaded_tar = 1
+g.loaded_tarPlugin = 1
 
-local core_modules = { "settings", "settings.netrw", "config.ui", "config" }
-for i = 1, #core_modules, 1 do
-  local ok, err = xpcall(require, debug.traceback, ("doom.core.%s"):format(core_modules[i]))
-  if ok then
-    if core_modules[i] == "settings" then
-      -- Neovim configurations, e.g. shiftwidth
-      require("doom.core.settings").load_default_options()
-      -- User-defined settings (global variables, mappings, ect)
-      require("doom.core.settings").custom_options()
-      -- Doom Nvim custom commands
-      require("doom.core.settings").doom_commands()
-    end
-    log.debug(string.format("Successfully loaded 'doom.core.%s' module", core_modules[i]))
-  else
-    log.error(
-      string.format(
-        "There was an error loading the module 'doom.core.%s'. Traceback:\n%s",
-        core_modules[i],
-        err
-      )
-    )
-  end
+g.loaded_getscript = 1
+g.loaded_getscriptPlugin = 1
+g.loaded_vimball = 1
+g.loaded_vimballPlugin = 1
+g.loaded_2html_plugin = 1
+
+g.loaded_matchit = 1
+g.loaded_matchparen = 1
+g.loaded_logiPat = 1
+g.loaded_rrhelper = 1
+
+-- Sets the `doom` global object
+require("doom.core.doom_global")
+
+local utils = require("doom.utils")
+
+-- Boostraps the doom-nvim framework, runs the user's `config.lua` file.
+local config = utils.safe_require("doom.core.config")
+config.load()
+if not utils.is_module_enabled("features", "netrw") then
+  g.loaded_netrw = 1
+  g.loaded_netrwPlugin = 1
+  g.loaded_netrwSettings = 1
+  g.loaded_netrwFileHandlers = 1
 end
+
+-- Load the colourscheme
+utils.safe_require("doom.core.ui")
+
+-- Set some extra commands
+utils.safe_require("doom.core.commands")
+
+-- Load Doom modules.
+local modules = utils.safe_require("doom.core.modules")
+modules.start()
+modules.load_modules()
+modules.handle_user_config()
+modules.try_sync()
+
+-- Execute autocommand for user to hook custom config into
+vim.api.nvim_exec_autocmds("User", {
+  pattern = "DoomStarted",
+})
+
+-- vim: fdm=marker
